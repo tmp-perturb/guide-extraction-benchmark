@@ -1,0 +1,39 @@
+# Combined, path-independent software environment for the guide_extraction module.
+#
+# Omnibenchmark assigns ONE software_environment per module, so this single env
+# provides BOTH the analysis stack (whitelist / reference / merge helper scripts)
+# AND the quantification tools (simpleaf + piscem + alevin-fry), plus HAM.
+#
+# It replaces the two machine-specific conda envs of the standalone workflow
+# (scp_analysis + simpleaf) and the editable `pip install -e /home/yunzliu/ham`.
+# HAM is pinned to a Git commit so no local checkout is required.
+#
+# Versions are pinned from the standalone workflow's lock files
+# (envs/scp_analysis.lock.yaml, envs/simpleaf.lock.yaml). Regenerate a full
+# lock with `conda-lock` / `conda env export` once the env solves on the target.
+name: guide_extraction
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.10
+  # analysis stack (whitelist QC, reference adapter, merge)
+  - numpy>=1.24
+  - scipy>=1.10
+  - pandas=2.3.1
+  - h5py=3.14.0
+  - anndata=0.10.9
+  - mudata
+  - scanpy=1.10.3
+  - cutadapt
+  - pyyaml
+  # quantification tools (method: simpleaf)
+  - simpleaf=0.24.0
+  - piscem=0.19.0
+  - alevin-fry=0.14.0
+  - salmon=1.10.3
+  - pip
+  - pip:
+      # HAM: hash-accelerated matcher (method: hash_matcher + merge step).
+      # Pinned to a commit for reproducibility (repo must be public to clone).
+      - "git+https://github.com/yunzhe-liu/ham.git@52ef3dfe202fd3e9494cfcad08d9cb5283869363"

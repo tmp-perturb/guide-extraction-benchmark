@@ -1,0 +1,156 @@
+id: guide_extraction_minimal
+description: "Minimal Guide Extraction benchmark: one K562 lane, data -> guide_extraction(sweep) -> metrics."
+version: "0.3.0"
+benchmarker: "Yunzhe Liu, richelieu.xmas@gmail.com"
+
+software_backend: conda
+software_environments:
+  guide_extraction:
+    description: "Guide extraction + metrics stack: simpleaf/piscem/alevin-fry + HAM + anndata/scipy."
+    # Env kept in the plan repo (omni-perturb convention). HAM is pinned via
+    # git+https inside the yml (repo must be public to build).
+    conda: envs/guide_extraction.yaml
+
+stages:
+  # ---- data: one dataset (K562 lane01), external files materialised into the DAG ----
+  - id: data
+    resources:
+      cores: 4
+      memory: "16GB"
+    modules:
+      - id: lane01
+        name: "K562 lane01 inputs"
+        software_environment: guide_extraction
+        repository:
+          url: https://github.com/yunzhe-liu/guide-extraction-data
+          commit: f4989c362fae1675132a0c4203828c0f3ff7cf50
+        parameters:
+          - guide_csv: "/data/yunzliu/references/raw_guides_k562_essential.csv"
+            gex_h5: "/data/yunzliu/raw_fastq/full/scprocess_out/lane01/output/lane01_mapping/af_lane01/af_counts_mat.h5"
+            sgRNA_r1: "/data/yunzliu/raw_fastq/sgRNA_download/fastq/SRR19330404/SRR19330404_1.fastq.gz,/data/yunzliu/raw_fastq/sgRNA_download/fastq/SRR19330632/SRR19330632_1.fastq.gz,/data/yunzliu/raw_fastq/sgRNA_download/fastq/SRR19330643/SRR19330643_1.fastq.gz,/data/yunzliu/raw_fastq/sgRNA_download/fastq/SRR19330707/SRR19330707_1.fastq.gz"
+            sgRNA_r2: "/data/yunzliu/raw_fastq/sgRNA_download/fastq/SRR19330404/SRR19330404_2.fastq.gz,/data/yunzliu/raw_fastq/sgRNA_download/fastq/SRR19330632/SRR19330632_2.fastq.gz,/data/yunzliu/raw_fastq/sgRNA_download/fastq/SRR19330643/SRR19330643_2.fastq.gz,/data/yunzliu/raw_fastq/sgRNA_download/fastq/SRR19330707/SRR19330707_2.fastq.gz"
+            reference: "/data/yunzliu/references/published/K562ess_literature_pairs.h5ad"
+    outputs:
+      - id: data.guide_csv
+        path: "{dataset}_guide_csv.csv"
+      - id: data.gex_h5
+        path: "{dataset}_gex.h5"
+      - id: data.sgRNA_r1
+        path: "{dataset}_sgRNA_r1.fastq.gz"
+      - id: data.sgRNA_r2
+        path: "{dataset}_sgRNA_r2.fastq.gz"
+      - id: data.reference
+        path: "{dataset}_reference.h5ad"
+
+  # ---- guide_extraction: method/parameter sweep (config-driven, one module) ----
+  # 5 interchangeable configs, each a param dict (unioned -> 5 lineages):
+  # simpleaf k13/k15/k17 (paired minimizer), simpleaf knee, and HAM (hash_matcher).
+  # Cell Ranger is intentionally excluded (external, not an OB module).
+  - id: guide_extraction
+    resources:
+      cores: 8
+      memory: "32GB"
+    modules:
+      - id: extract
+        name: "guide extraction (simpleaf k-sweep + knee + HAM)"
+        software_environment: guide_extraction
+        repository:
+          url: https://github.com/yunzhe-liu/guide-extraction
+          commit: 1047488f29396ed010cf966ebebcd1490b0cff20
+        parameters:
+          # simpleaf, k=13 (m=9)
+          - method: "simpleaf"
+            tenx_chemistry: "3v3"
+            kmer_length: 13
+            minimizer_length: 9
+            resolution: "parsimony-gene"
+            use_knee: "false"
+            min_umi: 1000
+            min_genes: 500
+            umi_threshold: 1
+            cb_max_hamming: 1
+            translation_table: "/data/yunzliu/references/translation_3M-february-2018.txt"
+          # simpleaf, k=15 (m=11)
+          - method: "simpleaf"
+            tenx_chemistry: "3v3"
+            kmer_length: 15
+            minimizer_length: 11
+            resolution: "parsimony-gene"
+            use_knee: "false"
+            min_umi: 1000
+            min_genes: 500
+            umi_threshold: 1
+            cb_max_hamming: 1
+            translation_table: "/data/yunzliu/references/translation_3M-february-2018.txt"
+          # simpleaf, k=17 (m=13)
+          - method: "simpleaf"
+            tenx_chemistry: "3v3"
+            kmer_length: 17
+            minimizer_length: 13
+            resolution: "parsimony-gene"
+            use_knee: "false"
+            min_umi: 1000
+            min_genes: 500
+            umi_threshold: 1
+            cb_max_hamming: 1
+            translation_table: "/data/yunzliu/references/translation_3M-february-2018.txt"
+          # simpleaf, knee-calling (k=15, no explicit whitelist)
+          - method: "simpleaf"
+            tenx_chemistry: "3v3"
+            kmer_length: 15
+            minimizer_length: 11
+            resolution: "parsimony-gene"
+            use_knee: "true"
+            min_umi: 1000
+            min_genes: 500
+            umi_threshold: 1
+            cb_max_hamming: 1
+            translation_table: "/data/yunzliu/references/translation_3M-february-2018.txt"
+          # HAM (hash_matcher)
+          - method: "hash_matcher"
+            tenx_chemistry: "3v3"
+            kmer_length: 15
+            minimizer_length: 11
+            resolution: "parsimony-gene"
+            use_knee: "false"
+            min_umi: 1000
+            min_genes: 500
+            umi_threshold: 1
+            cb_max_hamming: 1
+            translation_table: "/data/yunzliu/references/translation_3M-february-2018.txt"
+    inputs:
+      - data.guide_csv
+      - data.gex_h5
+      - data.sgRNA_r1
+      - data.sgRNA_r2
+    outputs:
+      - id: guide_extraction.matrix
+        path: "merged_matrix.mtx.gz"
+      - id: guide_extraction.barcodes
+        path: "merged_barcodes.tsv.gz"
+      - id: guide_extraction.features
+        path: "merged_features.tsv.gz"
+
+  # ---- metrics: score the extraction MEX against the reference matrix ----
+  - id: metrics
+    resources:
+      cores: 2
+      memory: "16GB"
+    modules:
+      - id: extraction_eval
+        name: "extraction benchmark (pseudobulk + per-cell)"
+        software_environment: guide_extraction
+        repository:
+          url: https://github.com/yunzhe-liu/guide-extraction-metrics
+          commit: 40f8a8c6d0146c02d7df6f3db03926904fe94eb6
+        parameters:
+          - guide_mode: "dual"
+    inputs:
+      - guide_extraction.matrix
+      - guide_extraction.barcodes
+      - guide_extraction.features
+      - data.reference
+      - data.guide_csv
+    outputs:
+      - id: metrics.scores
+        path: "{dataset}.scores.json"
