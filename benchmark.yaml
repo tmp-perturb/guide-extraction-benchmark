@@ -23,7 +23,7 @@ stages:
         software_environment: guide_extraction
         repository:
           url: https://github.com/yunzhe-liu/guide-extraction-data
-          commit: f4989c362fae1675132a0c4203828c0f3ff7cf50
+          commit: 47f40c6fb3dbd704ecece8099c58a80f6d8592d3
         parameters:
           - guide_csv: "/data/yunzliu/references/raw_guides_k562_essential.csv"
             gex_h5: "/data/yunzliu/raw_fastq/full/scprocess_out/lane01/output/lane01_mapping/af_lane01/af_counts_mat.h5"
@@ -56,7 +56,7 @@ stages:
         software_environment: guide_extraction
         repository:
           url: https://github.com/yunzhe-liu/guide-extraction
-          commit: 1047488f29396ed010cf966ebebcd1490b0cff20
+          commit: 080002a99ce908d1b6a86a54ab5d58929419583a
         parameters:
           # simpleaf, k=13 (m=9)
           - method: "simpleaf"
@@ -142,7 +142,7 @@ stages:
         software_environment: guide_extraction
         repository:
           url: https://github.com/yunzhe-liu/guide-extraction-metrics
-          commit: 40f8a8c6d0146c02d7df6f3db03926904fe94eb6
+          commit: 82a47b7157a1515bba6fdff76c1036abd53fcd9b
         parameters:
           - guide_mode: "dual"
     inputs:
