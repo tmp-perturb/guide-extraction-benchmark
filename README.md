@@ -29,6 +29,9 @@ ob run benchmark.yaml --cores 4
 ```
 
 Software: one conda env (`envs/guide_extraction.yaml`); HAM pinned via git.
+The pinned HAM repository must also be anonymously readable for a clean
+environment rebuild; this dependency is tracked separately from the three
+benchmark module repositories.
 
 ## Validation
 

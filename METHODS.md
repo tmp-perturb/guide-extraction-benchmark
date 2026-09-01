@@ -84,7 +84,8 @@ ob run benchmark.yaml --cores 4                  # execute the sweep
 The module repositories are public and pinned by commit, so `--dirty` is not
 needed for normal runs. Software: one conda env kept **in this plan
 repo** (`envs/guide_extraction.yaml`, omni-perturb convention) —
-simpleaf/piscem/alevin-fry + HAM (pinned wheel) + anndata/scipy. Each stage
+simpleaf/piscem/alevin-fry + HAM (pinned Git commit) + anndata/scipy. The HAM
+repository must be anonymously readable for a clean environment rebuild. Each stage
 declares `resources:` (`cores`/`memory`) as scheduling hints.
 
 ## 8. Consistency validation (why we trust the standardization)
