@@ -22,8 +22,8 @@ stages:
         name: "K562 lane01 inputs"
         software_environment: guide_extraction
         repository:
-          url: https://github.com/yunzhe-liu/guide-extraction-data
-          commit: 47f40c6fb3dbd704ecece8099c58a80f6d8592d3
+          url: https://github.com/tmp-perturb/guide-extraction-data
+          commit: 2ef7046bec739f15e9af120ad837ddc8c01c7c14
         parameters:
           - guide_csv: "/data/yunzliu/references/raw_guides_k562_essential.csv"
             gex_h5: "/data/yunzliu/raw_fastq/full/scprocess_out/lane01/output/lane01_mapping/af_lane01/af_counts_mat.h5"
@@ -55,8 +55,8 @@ stages:
         name: "guide extraction (simpleaf k-sweep + knee + HAM)"
         software_environment: guide_extraction
         repository:
-          url: https://github.com/yunzhe-liu/guide-extraction
-          commit: 080002a99ce908d1b6a86a54ab5d58929419583a
+          url: https://github.com/tmp-perturb/guide-extraction
+          commit: ead40a49db8c4957b83be174884616ce39481aed
         parameters:
           # simpleaf, k=13 (m=9)
           - method: "simpleaf"
@@ -141,8 +141,8 @@ stages:
         name: "extraction benchmark (pseudobulk + per-cell)"
         software_environment: guide_extraction
         repository:
-          url: https://github.com/yunzhe-liu/guide-extraction-metrics
-          commit: 82a47b7157a1515bba6fdff76c1036abd53fcd9b
+          url: https://github.com/tmp-perturb/guide-extraction-metrics
+          commit: 544de6f27d048845d1a2e2f832769c2ccbef00cb
         parameters:
           - guide_mode: "dual"
     inputs:

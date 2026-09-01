@@ -7,9 +7,9 @@
 
 | stage | repo | role |
 |-------|------|------|
-| `data` | [guide-extraction-data](https://github.com/yunzhe-liu/guide-extraction-data) | materialise inputs + reference into the DAG |
-| `guide_extraction` | [guide-extraction](https://github.com/yunzhe-liu/guide-extraction) | reference → whitelist → quant → merge (simpleaf / HAM) |
-| `metrics` | [guide-extraction-metrics](https://github.com/yunzhe-liu/guide-extraction-metrics) | pseudobulk + per-cell vs reference matrix |
+| `data` | [guide-extraction-data](https://github.com/tmp-perturb/guide-extraction-data) | materialise inputs + reference into the DAG |
+| `guide_extraction` | [guide-extraction](https://github.com/tmp-perturb/guide-extraction) | reference → whitelist → quant → merge (simpleaf / HAM) |
+| `metrics` | [guide-extraction-metrics](https://github.com/tmp-perturb/guide-extraction-metrics) | pseudobulk + per-cell vs reference matrix |
 
 Module commits are pinned in `benchmark.yaml`.
 

@@ -27,9 +27,9 @@ Dry-run: `1 data → 5 extraction → 5 metrics` (11 rules).
 
 | Stage | Module | Repo @ commit | Role |
 |-------|--------|---------------|------|
-| data | `guide_extraction_data` | `/home/yunzliu/omnibenchmark_modules/guide_extraction_data` @ `b1e3c50` | Materialise external inputs into the DAG (symlink singles, concat multi-part FASTQ); emits `data.reference` |
-| guide_extraction | `guide_extraction` | `/home/yunzliu/omnibenchmark_modules/guide_extraction` @ `c379efa` | Reference gen → whitelist → quant (simpleaf/HAM) → merge → MEX |
-| metrics | `guide_extraction_metrics` | `/home/yunzliu/omnibenchmark_modules/guide_extraction_metrics` @ `b01a3ea` | Score MEX vs reference (wraps `benchmark_extraction.py` + `lib/`) |
+| data | `guide_extraction_data` | [guide-extraction-data](https://github.com/tmp-perturb/guide-extraction-data) @ `2ef7046` | Materialise external inputs into the DAG (symlink singles, concat multi-part FASTQ); emits `data.reference` |
+| guide_extraction | `guide_extraction` | [guide-extraction](https://github.com/tmp-perturb/guide-extraction) @ `ead40a4` | Reference gen → whitelist → quant (simpleaf/HAM) → merge → MEX |
+| metrics | `guide_extraction_metrics` | [guide-extraction-metrics](https://github.com/tmp-perturb/guide-extraction-metrics) @ `544de6f` | Score MEX vs reference (wraps `benchmark_extraction.py` + `lib/`) |
 
 ## 4. Inputs & reference
 
@@ -77,12 +77,12 @@ Cells matched by `(16mer, lane)` compound key (handles `-L01` and `-NN`).
 ```bash
 conda activate omnibenchmark          # ob CLI (v0.6.0)
 ob validate plan benchmark.yaml
-ob run benchmark.yaml --cores 1 --dry --dirty    # inspect DAG (no execution)
-ob run benchmark.yaml --cores 4 --dirty          # execute the sweep
+ob run benchmark.yaml --cores 1 --dry            # inspect DAG (no execution)
+ob run benchmark.yaml --cores 4                  # execute the sweep
 ```
 
-`--dirty` is required while modules are referenced by local path (drop it once
-the module repos are published). Software: one conda env kept **in this plan
+The module repositories are public and pinned by commit, so `--dirty` is not
+needed for normal runs. Software: one conda env kept **in this plan
 repo** (`envs/guide_extraction.yaml`, omni-perturb convention) —
 simpleaf/piscem/alevin-fry + HAM (pinned wheel) + anndata/scipy. Each stage
 declares `resources:` (`cores`/`memory`) as scheduling hints.
@@ -146,7 +146,7 @@ Remaining deltas:
 | commit pinning | `main` (branch) | pinned SHA | we are stricter; kept |
 | env tooling | conda + pixi | conda + vendored wheel | optional (pixi not needed) |
 | datasets | `dataset_name: [K562_essential, rpe1]` | single `lane01` | deferred (needs 2nd dataset) |
-| code hosting | public GitHub org | local (`--dirty`) | deferred (publish) |
+| code hosting | public GitHub org | public GitHub org | ✅ aligned |
 | metrics output | `parquet` + `tsv` | `scores.json` | deferred (format) |
 | **data I/O format** | **h5mu / h5ad** | **MEX trio + h5ad ref** | **deferred by design** — see 11.4 |
 
@@ -160,7 +160,8 @@ Both verified non-breaking (`ob validate` ✓; dry-run unchanged at 11 rules).
 
 ### 11.4 Deliberately deferred
 
-- **GitHub publishing** (drop `--dirty`) — operational, on request.
+- **GitHub publishing** — completed; all module repositories are public and
+  referenced by pinned commits.
 - **Metrics output format** (`parquet`/`tsv`; `parquet` needs `pyarrow`).
 - **MEX → h5mu adapter** — **not a defect.** h5mu is what *omni-perturb's*
   assignment consumes; **our own** guide-assignment benchmark consumes MEX, so
